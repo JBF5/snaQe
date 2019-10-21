@@ -17,7 +17,7 @@ public class Apple : MonoBehaviour
         
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         SnakeController sc = collision.gameObject.GetComponent<SnakeController>();
         if (sc != null)

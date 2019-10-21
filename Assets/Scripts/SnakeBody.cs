@@ -17,20 +17,19 @@ public class SnakeBody : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
-    public void GameStep()
+    public void MoveTo(Vector2 newPos)
     {
-        if (front != null)
+        Vector2 oldPos = transform.position;
+        transform.position = newPos;
+
+        if (back != null)
         {
-            front.GameStep();
-            if (front.qPastPos.Count == 2)
-            {
-                Vector2 curPos = front.qPastPos.Dequeue();
-                transform.position = (curPos);
-                qPastPos.Enqueue(curPos);
-            } else
-            {
-                front.qPastPos.Clear();
-            }
+            back.MoveTo(oldPos);
+        }
+
+        if (!rb.simulated)
+        {
+            rb.simulated = true;
         }
     }
 }

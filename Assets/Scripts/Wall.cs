@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Wall : MonoBehaviour
+public class Wall : GamePiece
 {
+    public override void GameStep()
+    {
+
+    }
+
     // Start is called before the first frame update
     void Start()
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnakeController : MonoBehaviour
+public class SnakeController : GamePiece
 {
     public SnakeBody sbSnakeHead;
     private int length = 1;
@@ -10,30 +10,20 @@ public class SnakeController : MonoBehaviour
 
     public GameObject goBodyPrefab;
 
-    private Rigidbody2D rb;
-
     private Turning dir = Turning.FORWARD;
     private Compas compas = Compas.NORTH;
 
     private Vector2 dest;
-
-    private int f = 0;
 
     // Start is called before the first frame update
     void Start()
     {
         sbSnakeTail = sbSnakeHead;
         dest = transform.position;
-        rb = GetComponent<Rigidbody2D>();
     }
 
-    void FixedUpdate()
+    public override void GameStep()
     {
-        f += 1;
-        if (f % 8 != 0)
-        {
-            return;
-        }
         switch (dir)
         {
             case Turning.FORWARD:
@@ -64,10 +54,8 @@ public class SnakeController : MonoBehaviour
                 dest.x -= 1;
                 break;
         }
-        transform.position = (dest);
-        sbSnakeHead.qPastPos.Enqueue(dest);
 
-        sbSnakeTail.GameStep();
+        sbSnakeHead.MoveTo(dest);
     }
 
     public void TurnTo(Compas c)
@@ -85,8 +73,12 @@ public class SnakeController : MonoBehaviour
 
     public void Eat()
     {
-        GameObject go = Instantiate(goBodyPrefab, dest, Quaternion.identity);
+        GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
+
+        GameMaster.AddBody(sb);
+        GameMaster.AddScore(1);
+
         if (length == 1)
         {
             sbSnakeHead.back = sb;
@@ -98,9 +90,7 @@ public class SnakeController : MonoBehaviour
             sb.front = sbSnakeTail;
             sbSnakeTail = sb;
         }
-        //go.transform.position = sb.front.transform.position;
-        sb.front.qPastPos.Clear();
-        sb.front.qPastPos.Enqueue(new Vector2());
+
         length++;
     }
 
@@ -109,6 +99,7 @@ public class SnakeController : MonoBehaviour
         if (collision.gameObject.GetComponent<Wall>() != null)
         {
             Debug.Log("Dead");
+            GameMaster.GameOver();
         } else if (collision.gameObject.GetComponent<Wall>() != null)
         {
             Debug.Log("Apple");
@@ -123,4 +114,5 @@ public class SnakeController : MonoBehaviour
         int rem = num % div;
         return rem < 0 ? rem + div : rem;
     }
+
 }
