@@ -7,11 +7,14 @@ public class GameMaster : MonoBehaviour
 {
     private static GameMaster gm;
 
-    private bool[][] board;
+    private bool[,] board;
+    public int size = 5;
+    private int offset;
     private List<GamePiece> gps;
     private List<SnakeBody> sbs;
 
     public SnakeBody sbHead;
+    public GameObject pfWall;
 
     public int gameStepsPerTurn = 8;
     private int gameStep = 0;
@@ -26,6 +29,19 @@ public class GameMaster : MonoBehaviour
     {
         gps = new List<GamePiece>(FindObjectsOfType<GamePiece>());
         sbs = new List<SnakeBody>(FindObjectsOfType<SnakeBody>());
+
+        board = new bool[size, size];
+        offset = size / 2;
+        bool odd = size % 2 != 0;
+        int wallOffset = offset + 1;
+        //spawn all walls
+        for (int i = -wallOffset; i < wallOffset + (odd ? 1: 0); i++)
+        {
+            Instantiate(pfWall, new Vector2(i, -wallOffset), Quaternion.identity);
+            Instantiate(pfWall, new Vector2(-wallOffset, i), Quaternion.identity);
+            Instantiate(pfWall, new Vector2(i, wallOffset - (odd ? 0 : 1)), Quaternion.identity);
+            Instantiate(pfWall, new Vector2(wallOffset - (odd ? 0 : 1), i), Quaternion.identity);
+        }
     }
 
     void FixedUpdate()
@@ -33,10 +49,15 @@ public class GameMaster : MonoBehaviour
         gameStep++;
         if (gameStep % gameStepsPerTurn == 0 && !gameOver)
         {
+            //Reset board
+            board = new bool[size, size];
+
+            //Build board
             foreach (GamePiece gp in gps)
             {
                 gp.GameStep();
             }
+
         }
 
 
@@ -70,5 +91,28 @@ public class GameMaster : MonoBehaviour
     {
         GetInstance().gameOver = true;
         GetInstance().gameOverOverlay.SetActive(true);
+    }
+
+    public static Vector2 GetRandomOpenSpace()
+    {
+        GameMaster mygm = GetInstance();
+        return new Vector2(Random.Range(0, mygm.size) - mygm.offset, Random.Range(0, mygm.size) - mygm.offset);
+    }
+
+    public static void Register(SnakeBody sb)
+    {
+        GameMaster mygm = GetInstance();
+        do
+        {
+            Vector2 sbPos = sb.transform.position + new Vector3(mygm.offset, mygm.offset);
+            mygm.board[(int)sbPos.x, (int)sbPos.y] = true;
+            sb = sb.back;
+        } while (sb != null);
+    }
+    public static float[] GetSight(SnakeController sc)
+    {
+        GameMaster mygm = GetInstance();
+        //robot sight
+        return null;
     }
 }

@@ -24,6 +24,8 @@ public class SnakeController : GamePiece
 
     public override void GameStep()
     {
+        GameMaster.Register(sbSnakeHead);
+
         switch (dir)
         {
             case Turning.FORWARD:
@@ -68,6 +70,19 @@ public class SnakeController : GamePiece
         else if (dirDiff == 3)
         {
             dir = Turning.LEFT;
+        }
+    }
+
+    public void TurnTo(int turn)
+    {
+        //1 turns left, -1 turns
+        if (turn == 1)
+        {
+            dir = Turning.LEFT;
+        }
+        else if (turn == -1)
+        {
+            dir = Turning.RIGHT;
         }
     }
 

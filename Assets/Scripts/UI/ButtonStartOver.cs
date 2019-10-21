@@ -16,6 +16,6 @@ public class ButtonStartOver : MonoBehaviour
 
     void OnClick()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().ToString());
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }
