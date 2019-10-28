@@ -4,13 +4,20 @@ using UnityEngine;
 
 public class SnakeController : GamePiece
 {
+    //Instance of SnakeBody Object
     public SnakeBody sbSnakeHead;
+
     private int length = 1;
+
+    //Instance of SnakeBody Object
     private SnakeBody sbSnakeTail;
 
+    //Unity GameObject
     public GameObject goBodyPrefab;
 
+    //Direction turning
     private Turning dir = Turning.FORWARD;
+    //Direction traveling
     private Compas compas = Compas.NORTH;
 
     private Vector2 dest;
@@ -18,7 +25,9 @@ public class SnakeController : GamePiece
     // Start is called before the first frame update
     void Start()
     {
+        //Length of snake is 1 so head = tail
         sbSnakeTail = sbSnakeHead;
+        
         dest = transform.position;
     }
 
@@ -73,9 +82,10 @@ public class SnakeController : GamePiece
         }
     }
 
+    //RoboSnake Turning Actions Left & Right
     public void TurnTo(int turn)
     {
-        //1 turns left, -1 turns
+        //1 turns left, -1 turns right
         if (turn == 1)
         {
             dir = Turning.LEFT;
