@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class SnakeController : GamePiece
 {
@@ -23,6 +24,10 @@ public class SnakeController : GamePiece
     private Vector2 dest;
 
     private MoveScore ms = MoveScore.MOVE;
+    
+    private int steps = 0;
+    private int apples = 0;
+    private int turns = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -43,9 +48,11 @@ public class SnakeController : GamePiece
                 break;
             case Turning.LEFT:
                 compas = (Compas)Mod((int)compas - 1, 4);
+                turns++;
                 break;
             case Turning.RIGHT:
                 compas = (Compas)Mod((int)compas + 1, 4);
+                turns++;
                 break;
         }
         dir = Turning.FORWARD;
@@ -68,6 +75,9 @@ public class SnakeController : GamePiece
                 dest.x -= 1;
                 break;
         }
+        
+        steps++;
+
         sbSnakeHead.MoveTo(dest);
 
         GameMaster.Register(sbSnakeHead);
@@ -146,6 +156,7 @@ public class SnakeController : GamePiece
             sbSnakeTail = sb;
         }
 
+        apples++;
         length++;
     }
 
@@ -154,6 +165,34 @@ public class SnakeController : GamePiece
         if (collision.gameObject.GetComponent<Wall>() != null)
         {
             GameMaster.GameOver();
+        }
+    }
+
+    IEnumerator LogSnake()
+    {
+        //Connect to questions database
+        string domain = "http://3.87.156.253/";
+        string attempts_url = domain + "snake_stats.php";
+
+        // Create a form object for sending data to the server
+        WWWForm form = new WWWForm();
+        form.AddField("steps", steps.ToString());
+        form.AddField("apples", apples.ToString());
+        form.AddField("turns", turns.ToString());
+
+        var download = UnityWebRequest.Post(attempts_url, form);
+
+        // Wait until the download is done
+        yield return download.SendWebRequest();
+
+        if (download.isNetworkError || download.isHttpError)
+        {
+            Debug.Log("Error downloading: " + download.error);
+
+        }
+        else
+        {
+            Debug.Log(download.downloadHandler.text + "\nAttempt sent successfully");
         }
     }
 
