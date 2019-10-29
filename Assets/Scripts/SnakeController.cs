@@ -91,6 +91,7 @@ public class SnakeController : GamePiece
     public override void GameOver()
     {
         ms = MoveScore.DIE;
+        StartCoroutine(LogSnake());
     }
 
     public int GetMoveScore()
@@ -188,7 +189,6 @@ public class SnakeController : GamePiece
         if (download.isNetworkError || download.isHttpError)
         {
             Debug.Log("Error downloading: " + download.error);
-
         }
         else
         {
