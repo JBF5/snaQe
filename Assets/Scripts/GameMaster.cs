@@ -47,6 +47,7 @@ public class GameMaster : MonoBehaviour
     void FixedUpdate()
     {
         gameStep++;
+        //If game is over reset board
         if (gameStep % gameStepsPerTurn == 0 && !gameOver)
         {
             //Reset board
@@ -112,6 +113,7 @@ public class GameMaster : MonoBehaviour
     public static float[] GetSight(SnakeController sc)
     {
         GameMaster mygm = GetInstance();
+        
         //robot sight
         return null;
     }
