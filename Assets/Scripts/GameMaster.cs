@@ -50,18 +50,27 @@ public class GameMaster : MonoBehaviour
         //If game is over reset board
         if (gameStep % gameStepsPerTurn == 0 && !gameOver)
         {
-            //Reset board
+            //We need to eval the step before to know the result from collisions in the turn before
+            foreach (GamePiece gp in gps)
+            {
+                gp.PostGameStep();
+            }
+
+            //Setup for movement
+            foreach (GamePiece gp in gps)
+            {
+                gp.PreGameStep();
+            }
+
+            //Reset virtual board
             board = new bool[size, size];
 
-            //Build board
+            //Move
             foreach (GamePiece gp in gps)
             {
                 gp.GameStep();
             }
-
         }
-
-
     }
 
     public static GameMaster GetInstance()
@@ -90,8 +99,23 @@ public class GameMaster : MonoBehaviour
 
     public static void GameOver()
     {
-        GetInstance().gameOver = true;
-        GetInstance().gameOverOverlay.SetActive(true);
+        if (!GetInstance().gameOver)
+        {
+            foreach (GamePiece gp in GetInstance().gps)
+            {
+                gp.GameOver();
+            }
+
+            //We need to eval the step before to know the result from collisions in the turn before
+            //One last post
+            foreach (GamePiece gp in GetInstance().gps)
+            {
+                gp.PostGameStep();
+            }
+
+            GetInstance().gameOver = true;
+            GetInstance().gameOverOverlay.SetActive(true);
+        }
     }
 
     public static Vector2 GetRandomOpenSpace()
@@ -103,12 +127,19 @@ public class GameMaster : MonoBehaviour
     public static void Register(SnakeBody sb)
     {
         GameMaster mygm = GetInstance();
-        do
+        try
         {
-            Vector2 sbPos = sb.transform.position + new Vector3(mygm.offset, mygm.offset);
-            mygm.board[(int)sbPos.x, (int)sbPos.y] = true;
-            sb = sb.back;
-        } while (sb != null);
+            do
+            {
+                    Vector2 sbPos = sb.transform.position + new Vector3(mygm.offset, mygm.offset);
+                    mygm.board[(int)sbPos.x, (int)sbPos.y] = true;
+                    sb = sb.back;
+            } while (sb != null);
+        }
+        catch (System.IndexOutOfRangeException e)
+        {
+            //User has died, will take care of itself
+        }
     }
     public static float[] GetSight(SnakeController sc)
     {

@@ -23,6 +23,8 @@ public class SnakeController : GamePiece
 
     private Vector2 dest;
 
+    private MoveScore ms = MoveScore.MOVE;
+    
     private int steps = 0;
     private int apples = 0;
     private int turns = 0;
@@ -36,27 +38,28 @@ public class SnakeController : GamePiece
         dest = transform.position;
     }
 
-    public override void GameStep()
+    public override void PreGameStep()
     {
-        GameMaster.Register(sbSnakeHead);
+        ms = MoveScore.MOVE;
 
         switch (dir)
         {
             case Turning.FORWARD:
                 break;
             case Turning.LEFT:
-                Debug.Log("Turning L");
                 compas = (Compas)Mod((int)compas - 1, 4);
                 turns++;
                 break;
             case Turning.RIGHT:
-                Debug.Log("Turning R");
                 compas = (Compas)Mod((int)compas + 1, 4);
                 turns++;
                 break;
         }
         dir = Turning.FORWARD;
+    }
 
+    public override void GameStep()
+    {
         switch (compas)
         {
             case Compas.NORTH:
@@ -72,10 +75,36 @@ public class SnakeController : GamePiece
                 dest.x -= 1;
                 break;
         }
-
+        
         steps++;
 
         sbSnakeHead.MoveTo(dest);
+
+        GameMaster.Register(sbSnakeHead);
+    }
+
+    public override void PostGameStep()
+    {
+
+    }
+
+    public override void GameOver()
+    {
+        ms = MoveScore.DIE;
+    }
+
+    public int GetMoveScore()
+    {
+        switch (ms)
+        {
+            case MoveScore.MOVE:
+                return -1;
+            case MoveScore.EAT:
+                return 10;
+            case MoveScore.DIE:
+                return -100;
+        }
+        return -1;
     }
 
     public void TurnTo(Compas c)
@@ -107,6 +136,8 @@ public class SnakeController : GamePiece
 
     public void Eat()
     {
+        ms = MoveScore.EAT;
+
         GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
 
@@ -133,13 +164,7 @@ public class SnakeController : GamePiece
     {
         if (collision.gameObject.GetComponent<Wall>() != null)
         {
-            Debug.Log("Dead");
             GameMaster.GameOver();
-            StartCoroutine(LogSnake());
-
-        } else if (collision.gameObject.GetComponent<Wall>() != null)
-        {
-            Debug.Log("Apple");
         }
     }
 
@@ -172,7 +197,8 @@ public class SnakeController : GamePiece
     }
 
     public enum Turning {FORWARD, LEFT, RIGHT};
-    public enum Compas {NORTH, EAST, SOUTH, WEST};
+    public enum Compas { NORTH, EAST, SOUTH, WEST };
+    public enum MoveScore {MOVE, EAT, DIE};
 
     private int Mod(int num, int div)
     {
