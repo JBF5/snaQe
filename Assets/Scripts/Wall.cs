@@ -4,7 +4,22 @@ using UnityEngine;
 
 public class Wall : GamePiece
 {
+    public override void GameOver()
+    {
+
+    }
+
     public override void GameStep()
+    {
+
+    }
+
+    public override void PostGameStep()
+    {
+
+    }
+
+    public override void PreGameStep()
     {
 
     }
