@@ -32,6 +32,15 @@ public class SnakeController : GamePiece
     // Start is called before the first frame update
     void Start()
     {
+        if (PlayerPrefs.GetInt("isbot") == 1)
+        {
+            sbSnakeHead.gameObject.AddComponent<RoboSnake>();
+        }
+        else
+        {
+            sbSnakeHead.gameObject.AddComponent<HumanSnake>();
+        }
+
         //Length of snake is 1 so head = tail
         sbSnakeTail = sbSnakeHead;
         
@@ -91,7 +100,7 @@ public class SnakeController : GamePiece
     public override void GameOver()
     {
         ms = MoveScore.DIE;
-        StartCoroutine(LogSnake());
+        StartCoroutine(LogSnakeStats());
     }
 
     public int GetMoveScore()
@@ -169,7 +178,7 @@ public class SnakeController : GamePiece
         }
     }
 
-    IEnumerator LogSnake()
+    IEnumerator LogSnakeStats()
     {
         //Connect to questions database
         string domain = "http://3.87.156.253/";
@@ -180,6 +189,8 @@ public class SnakeController : GamePiece
         form.AddField("steps", steps.ToString());
         form.AddField("apples", apples.ToString());
         form.AddField("turns", turns.ToString());
+        Debug.Log(PlayerPrefs.GetInt("idplayer").ToString());
+        form.AddField("idplayer", PlayerPrefs.GetInt("idplayer").ToString());
 
         var download = UnityWebRequest.Post(attempts_url, form);
 
