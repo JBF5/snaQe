@@ -8,11 +8,13 @@ public class GameMaster : MonoBehaviour
     private static GameMaster gm;
 
     private bool[,] board;
-    public int size = 5;
+    
+    public  int size = 5;
+
     private int offset;
     private List<GamePiece> gps;
     private List<SnakeBody> sbs;
-
+    
     public SnakeBody sbHead;
     public GameObject pfWall;
 
@@ -31,6 +33,8 @@ public class GameMaster : MonoBehaviour
         sbs = new List<SnakeBody>(FindObjectsOfType<SnakeBody>());
 
         board = new bool[size, size];
+        
+
         offset = size / 2;
         bool odd = size % 2 != 0;
         int wallOffset = offset + 1;
@@ -141,7 +145,8 @@ public class GameMaster : MonoBehaviour
             //User has died, will take care of itself
         }
     }
-    public static float[] GetSight(SnakeController sc)
+
+    public static int[] GetSight(SnakeController sc)
     {
         GameMaster mygm = GetInstance();
         
