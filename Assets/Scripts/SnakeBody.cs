@@ -27,9 +27,18 @@ public class SnakeBody : MonoBehaviour
             back.MoveTo(oldPos);
         }
 
-        if (!rb.simulated)
+        if (!(rb = GetComponent<Rigidbody2D>()).simulated)
         {
             rb.simulated = true;
         }
+    }
+
+    public void Remove()
+    {
+        if (back != null)
+        {
+            back.Remove();
+        }
+        Destroy(this.gameObject);
     }
 }

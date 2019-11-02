@@ -9,6 +9,11 @@ public class Wall : GamePiece
 
     }
 
+    public override void GameStart()
+    {
+
+    }
+
     public override void GameStep()
     {
 
