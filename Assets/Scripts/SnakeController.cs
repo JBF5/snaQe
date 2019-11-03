@@ -19,7 +19,7 @@ public class SnakeController : GamePiece
     //Direction turning
     private Turning dir = Turning.FORWARD;
     //Direction traveling
-    private Compas compas = Compas.NORTH;
+    public Compas compas = Compas.NORTH;
 
     private Vector2 dest;
 
@@ -32,15 +32,6 @@ public class SnakeController : GamePiece
     // Start is called before the first frame update
     void Start()
     {
-        if (PlayerPrefs.GetInt("isbot") == 1)
-        {
-            sbSnakeHead.gameObject.AddComponent<RoboSnake>();
-        }
-        else
-        {
-            sbSnakeHead.gameObject.AddComponent<HumanSnake>();
-        }
-
         //Length of snake is 1 so head = tail
         sbSnakeTail = sbSnakeHead;
         
@@ -94,13 +85,14 @@ public class SnakeController : GamePiece
 
     public override void PostGameStep()
     {
-
+        int[] postSight = GameMaster.GetSight(this);
+        Debug.Log("Post " + postSight[0] + ", " + postSight[1] + ", " + postSight[2]);
     }
 
     public override void GameOver()
     {
-        ms = MoveScore.DIE;
         StartCoroutine(LogSnakeStats());
+        sbSnakeHead.Remove();
     }
 
     public int GetMoveScore()
@@ -108,9 +100,9 @@ public class SnakeController : GamePiece
         switch (ms)
         {
             case MoveScore.MOVE:
-                return -1;
+                return -2;
             case MoveScore.EAT:
-                return 10;
+                return 25;
             case MoveScore.DIE:
                 return -100;
         }
@@ -138,7 +130,7 @@ public class SnakeController : GamePiece
         {
             dir = Turning.LEFT;
         }
-        else if (turn == -1)
+        else if (turn == 2)
         {
             dir = Turning.RIGHT;
         }
@@ -151,7 +143,6 @@ public class SnakeController : GamePiece
         GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
 
-        GameMaster.AddBody(sb);
         GameMaster.AddScore(1);
 
         if (length == 1)
@@ -174,7 +165,8 @@ public class SnakeController : GamePiece
     {
         if (collision.gameObject.GetComponent<Wall>() != null)
         {
-            GameMaster.GameOver();
+            ms = MoveScore.DIE;
+            GameMaster.GetInstance().gameOver = true;
         }
     }
 
@@ -211,10 +203,14 @@ public class SnakeController : GamePiece
     public enum Compas { NORTH, EAST, SOUTH, WEST };
     public enum MoveScore {MOVE, EAT, DIE};
 
-    private int Mod(int num, int div)
+    public static int Mod(int num, int div)
     {
         int rem = num % div;
         return rem < 0 ? rem + div : rem;
     }
 
+    public override void GameStart()
+    {
+
+    }
 }
