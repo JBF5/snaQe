@@ -100,9 +100,9 @@ public class SnakeController : GamePiece
         switch (ms)
         {
             case MoveScore.MOVE:
-                return -2;
+                return -1;
             case MoveScore.EAT:
-                return 25;
+                return 250;
             case MoveScore.DIE:
                 return -100;
         }

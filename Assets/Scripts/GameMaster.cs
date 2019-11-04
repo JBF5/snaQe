@@ -209,10 +209,26 @@ public class GameMaster : MonoBehaviour
     {
         GameMaster mygm = GetInstance();
 
-        int[] sight = new int[3];
+        int[] sight = new int[5];
 
         int dir = (int)sc.compas;
         Vector2 v2 = sc.transform.position;
+        Vector2 v2a = (Vector2)mygm.a.transform.position - v2;
+        if((int)v2a.x > 0)
+        {
+            v2a.x = 1;
+        }
+        else if((int)v2a.x < 0){
+            v2a.x = -1;
+        }
+        if ((int)v2a.y > 0)
+        {
+            v2a.y = 1;
+        }
+        else if ((int)v2a.y < 0)
+        {
+            v2a.y = -1;
+        }
 
         Vector2[] v2Possible = new Vector2[4];
         v2Possible[0] = v2 + new Vector2(0, 1);
@@ -225,6 +241,8 @@ public class GameMaster : MonoBehaviour
         sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
         sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
         sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+        sight[3] = (int)v2a.x;
+        sight[4] = (int)v2a.y;
 
         //robot sight
         return sight;

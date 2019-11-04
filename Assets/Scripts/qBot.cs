@@ -10,6 +10,8 @@ public class qBot
     int actionSize = 3;
     private float lr;
     private float y;
+    private float eps;
+    private float epsDec;
     private int[] previousSight;
     private string prevSight;
     private int action = -1;
@@ -21,6 +23,8 @@ public class qBot
         qTable = new Dictionary<string, float[]>();
         lr = .8f;
         y = .95f;
+        eps = .999f;
+        epsDec = .001f;
     }
 
     public static qBot GetInstance()
@@ -56,6 +60,15 @@ public class qBot
             //Takes a random action
             action = rn.Next(0,actionSize);
         }
+        if(eps > rn.NextDouble())  //Takes a random action
+        {
+            action = rn.Next(0, actionSize);
+        }
+
+        eps = eps - epsDec;    //Slowly takes away randomness
+        
+        
+
         return action;
     }
 
