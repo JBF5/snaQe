@@ -28,6 +28,7 @@ public class SnakeController : GamePiece
     private int steps = 0;
     private int apples = 0;
     private int turns = 0;
+    private int stepsWithoutFood = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -77,6 +78,13 @@ public class SnakeController : GamePiece
         }
         
         steps++;
+        stepsWithoutFood++;
+
+        if (stepsWithoutFood > 1000 && PlayerPrefs.GetInt("isbot") == 1)
+        {
+            ms = MoveScore.DIE;
+            GameMaster.GetInstance().gameOver = true;
+        }
 
         sbSnakeHead.MoveTo(dest);
 
@@ -100,11 +108,11 @@ public class SnakeController : GamePiece
         switch (ms)
         {
             case MoveScore.MOVE:
-                return -1;
+                return PlayerPrefs.GetInt("move");
             case MoveScore.EAT:
-                return 250;
+                return PlayerPrefs.GetInt("apple");
             case MoveScore.DIE:
-                return -100;
+                return PlayerPrefs.GetInt("wall");
         }
         return -1;
     }
@@ -139,6 +147,8 @@ public class SnakeController : GamePiece
     public void Eat()
     {
         ms = MoveScore.EAT;
+
+        stepsWithoutFood = 0;
 
         GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
@@ -181,8 +191,8 @@ public class SnakeController : GamePiece
         form.AddField("steps", steps.ToString());
         form.AddField("apples", apples.ToString());
         form.AddField("turns", turns.ToString());
-        Debug.Log(PlayerPrefs.GetInt("idplayer").ToString());
         form.AddField("idplayer", PlayerPrefs.GetInt("idplayer").ToString());
+        form.AddField("killed", 0);
 
         var download = UnityWebRequest.Post(attempts_url, form);
 
