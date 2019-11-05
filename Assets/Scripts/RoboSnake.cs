@@ -8,8 +8,6 @@ public class RoboSnake : GamePiece
     private SnakeController sc;
     private GameMaster gmr;
     private qBot qb;
-    
-    
    
 
     private void Start()
@@ -38,7 +36,6 @@ public class RoboSnake : GamePiece
 
     public override void GameStep()
     {
-        
     }
 
     public override void PostGameStep()

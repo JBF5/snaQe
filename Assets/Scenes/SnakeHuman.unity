@@ -259,11 +259,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe4c9b7f8e4228a408ffe3d86db45b94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  size: 11
   pfSnakeHead: {fileID: 2340470662942886088, guid: f75541694ff7e5f46935254c0a539ab5,
     type: 3}
   pfWall: {fileID: 3401890245981442286, guid: ffa76c656a878004588529eedfa6da4f, type: 3}
-  gameStepsPerTurn: 25
+  gameStepsPerTurn: 8
   scoreText: {fileID: 1363881196}
   gameOverOverlay: {fileID: 1080527447}
   gameOver: 0

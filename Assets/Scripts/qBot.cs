@@ -21,10 +21,15 @@ public class qBot
     private qBot()
     {
         qTable = new Dictionary<string, float[]>();
-        lr = .8f;
-        y = .95f;
-        eps = .999f;
-        epsDec = .001f;
+        //lr = .8f;
+        //y = .95f;
+        //eps = .999f;
+        //epsDec = .001f;
+
+        lr = PlayerPrefs.GetFloat("learningRate");
+        y = PlayerPrefs.GetFloat("discount");
+        eps = PlayerPrefs.GetFloat("epsilon");
+        epsDec = PlayerPrefs.GetFloat("epsilonDec");
     }
 
     public static qBot GetInstance()

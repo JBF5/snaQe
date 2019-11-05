@@ -9,7 +9,16 @@ public class ButtonRunGame : MonoBehaviour
 {
     private Button btn;
 
-    public Text name;
+    public InputField txtName;
+    public InputField txtBoardSize;
+    public InputField txtLearningRate;
+    public InputField txtDiscount;
+    public InputField txtEpsilon;
+    public InputField txtEpsilonDec;
+    public InputField txtMove;
+    public InputField txtApple;
+    public InputField txtWall;
+
     public Toggle isbot;
 
     // Start is called before the first frame update
@@ -21,7 +30,18 @@ public class ButtonRunGame : MonoBehaviour
 
     void OnClick()
     {
-        PlayerPrefs.SetInt("isbot", isbot.isOn ? 1: 0);
+        PlayerPrefs.SetInt("isbot", isbot.isOn ? 1 : 0);
+        PlayerPrefs.SetInt("boardsize", int.Parse(txtBoardSize.text));
+
+        PlayerPrefs.SetFloat("learningRate", float.Parse(txtLearningRate.text));
+        PlayerPrefs.SetFloat("discount", float.Parse(txtDiscount.text));
+        PlayerPrefs.SetFloat("epsilon", float.Parse(txtEpsilon.text));
+        PlayerPrefs.SetFloat("epsilonDec", float.Parse(txtEpsilonDec.text));
+
+        PlayerPrefs.SetInt("move", int.Parse(txtMove.text));
+        PlayerPrefs.SetInt("wall", int.Parse(txtWall.text));
+        PlayerPrefs.SetInt("apple", int.Parse(txtApple.text));
+
         StartCoroutine(LogNewSnake());
     }
 
@@ -33,8 +53,18 @@ public class ButtonRunGame : MonoBehaviour
 
         // Create a form object for sending data to the server
         WWWForm form = new WWWForm();
-        form.AddField("name", name.text.ToString());
+        form.AddField("name", txtName.text.ToString());
         form.AddField("isbot", (isbot.isOn ? 1: 0).ToString());
+        form.AddField("boardsize",  (txtBoardSize.text));
+
+        form.AddField("learningRate",  (txtLearningRate.text));
+        form.AddField("discount",  (txtDiscount.text));
+        form.AddField("epsilon",  (txtEpsilon.text));
+        form.AddField("epsilonDec",  (txtEpsilonDec.text));
+
+        form.AddField("move",  (txtMove.text));
+        form.AddField("wall",  (txtWall.text));
+        form.AddField("apple", (txtApple.text));
 
         var download = UnityWebRequest.Post(attempts_url, form);
 

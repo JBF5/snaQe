@@ -11,7 +11,7 @@ public class GameMaster : MonoBehaviour
     private int upperBound = 0;
     private int lowerBound = 0;
 
-    public  int size = 5;
+    private int size;
 
     private int offset;
     private List<GamePiece> gps;
@@ -36,6 +36,7 @@ public class GameMaster : MonoBehaviour
 
         GetInstance().NewSnake();
 
+        size = PlayerPrefs.GetInt("boardsize");
         board = new int[size, size];
 
         string output = "";
@@ -214,20 +215,50 @@ public class GameMaster : MonoBehaviour
         int dir = (int)sc.compas;
         Vector2 v2 = sc.transform.position;
         Vector2 v2a = (Vector2)mygm.a.transform.position - v2;
-        if((int)v2a.x > 0)
+        
+        if (dir == 0 || dir == 2)
         {
-            v2a.x = 1;
-        }
-        else if((int)v2a.x < 0){
-            v2a.x = -1;
-        }
-        if ((int)v2a.y > 0)
+            if (((int)v2a.y < 0 && dir == 2) || ((int)v2a.y > 0 && dir == 0))
+            {
+                v2a.y = 2;
+            } else
+            {
+                v2a.y = -2;
+            }
+
+            if ((int)v2a.x < 0)
+            {
+                v2a.x = dir == 0 ? -1: 1;
+            } else if ((int)v2a.x > 0)
+            {
+                v2a.x = dir == 0 ? 1: -1;
+            } else
+            {
+                v2a.x = 0;
+            }
+        } else
         {
-            v2a.y = 1;
-        }
-        else if ((int)v2a.y < 0)
-        {
-            v2a.y = -1;
+            if (((int)v2a.x < 0 && dir == 3) || ((int)v2a.x > 0 && dir == 1))
+            {
+                v2a.x = 2;
+            }
+            else
+            {
+                v2a.x = -2;
+            }
+
+            if ((int)v2a.y < 0)
+            {
+                v2a.y = dir == 3 ? -1 : 1;
+            }
+            else if ((int)v2a.y > 0)
+            {
+                v2a.y = dir == 3 ? 1 : -1;
+            }
+            else
+            {
+                v2a.y = 0;
+            }
         }
 
         Vector2[] v2Possible = new Vector2[4];
