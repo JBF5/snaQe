@@ -29,6 +29,7 @@ public class SnakeController : GamePiece
     private int apples = 0;
     private int turns = 0;
     private int stepsWithoutFood = 0;
+    private int killed = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -83,6 +84,7 @@ public class SnakeController : GamePiece
         if (stepsWithoutFood > 1000 && PlayerPrefs.GetInt("isbot") == 1)
         {
             ms = MoveScore.DIE;
+            killed = 1;
             GameMaster.GetInstance().gameOver = true;
         }
 
@@ -94,7 +96,6 @@ public class SnakeController : GamePiece
     public override void PostGameStep()
     {
         int[] postSight = GameMaster.GetSight(this);
-        Debug.Log("Post " + postSight[0] + ", " + postSight[1] + ", " + postSight[2]);
     }
 
     public override void GameOver()
@@ -192,7 +193,7 @@ public class SnakeController : GamePiece
         form.AddField("apples", apples.ToString());
         form.AddField("turns", turns.ToString());
         form.AddField("idplayer", PlayerPrefs.GetInt("idplayer").ToString());
-        form.AddField("killed", 0);
+        form.AddField("killed", killed.ToString());
 
         var download = UnityWebRequest.Post(attempts_url, form);
 
@@ -205,7 +206,7 @@ public class SnakeController : GamePiece
         }
         else
         {
-            Debug.Log(download.downloadHandler.text + "\nAttempt sent successfully");
+            //Debug.Log(download.downloadHandler.text + "\nAttempt sent successfully");
         }
     }
 

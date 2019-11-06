@@ -14,6 +14,14 @@ public class ButtonStartOver : MonoBehaviour
         btn.onClick.AddListener(OnClick);
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.Space))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+    }
+
     void OnClick()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);

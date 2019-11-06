@@ -26,6 +26,7 @@ public class GameMaster : MonoBehaviour
     private int score;
 
     public GameObject gameOverOverlay;
+    public bool gameRunning = true;
     public bool gameOver = false;
     private bool newGame = true;
 
@@ -39,16 +40,16 @@ public class GameMaster : MonoBehaviour
         size = PlayerPrefs.GetInt("boardsize");
         board = new int[size, size];
 
-        string output = "";
-        for (int i = 0; i < board.GetLength(0); i++)
-        {
-            for (int j = 0; j < board.GetLength(1); j++)
-            {
-                output += i + " " + j + ", ";
-            }
-            output += "\n";
-        }
-        Debug.Log(output);
+        //string output = "";
+        //for (int i = 0; i < board.GetLength(0); i++)
+        //{
+        //    for (int j = 0; j < board.GetLength(1); j++)
+        //    {
+        //        output += i + " " + j + ", ";
+        //    }
+        //    output += "\n";
+        //}
+        //Debug.Log(output);
 
         offset = size / 2;
         bool odd = size % 2 != 0;
@@ -57,7 +58,7 @@ public class GameMaster : MonoBehaviour
         lowerBound = -wallOffset;
         upperBound = wallOffset - (odd ? 0 : 1);
         //spawn all walls
-        for (int i = -wallOffset; i < wallOffset + (odd ? 1: 0); i++)
+        for (int i = -wallOffset; i < wallOffset + (odd ? 1 : 0); i++)
         {
             Instantiate(pfWall, new Vector2(i, lowerBound), Quaternion.identity);
             Instantiate(pfWall, new Vector2(lowerBound, i), Quaternion.identity);
@@ -85,7 +86,7 @@ public class GameMaster : MonoBehaviour
     {
         gameStep++;
         //If game is over reset board
-        if (gameStep % gameStepsPerTurn == 0)
+        if (gameStep % gameStepsPerTurn == 0 && gameRunning)
         {
             if (!gameOver)
             {
@@ -100,20 +101,26 @@ public class GameMaster : MonoBehaviour
                         gp.PostGameStep();
                     }
 
-                    string output = "";
-                    for (int i = 0; i < board.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < board.GetLength(1); j++)
-                        {
-                            output += board[j, i];
-                        }
-                        output += "\n";
-                    }
-                    Debug.Log(output);
+                    //string output = "";
+                    //for (int i = 0; i < board.GetLength(0); i++)
+                    //{
+                    //    for (int j = 0; j < board.GetLength(1); j++)
+                    //    {
+                    //        output += board[j, i];
+                    //    }
+                    //    output += "\n";
+                    //}
+                    //Debug.Log(output);
                 }
                 else
                 {
-                    newGame = false; 
+                    newGame = false;
+
+                    if (PlayerPrefs.GetInt("isbot") == 1)
+                    {
+                        gameStepsPerTurn = 1;
+                    }
+
                     foreach (GamePiece gp in gps)
                     {
                         gp.GameStart();
@@ -128,8 +135,7 @@ public class GameMaster : MonoBehaviour
 
                 //Reset virtual board
                 board = new int[size, size];
-                Vector2 v2apple = AdjustPosToBoard((Vector2)a.transform.position);
-                board[(int)v2apple.x, (int)v2apple.y] = 2;
+
                 //Move
                 foreach (GamePiece gp in gps)
                 {
@@ -176,12 +182,15 @@ public class GameMaster : MonoBehaviour
         if (PlayerPrefs.GetInt("isbot") == 0)
         {
             GetInstance().gameOverOverlay.SetActive(true);
+            GetInstance().gameRunning = false;
+        } else
+        {
+            GetInstance().gameOver = false;
+            GetInstance().newGame = true;
+
+            GetInstance().NewSnake();
         }
 
-        GetInstance().gameOver = false;
-        GetInstance().newGame = true;
-
-        GetInstance().NewSnake();
     }
 
     public static Vector2 GetRandomOpenSpace()
@@ -210,35 +219,193 @@ public class GameMaster : MonoBehaviour
     {
         GameMaster mygm = GetInstance();
 
-        int[] sight = new int[5];
+        int[] sight = new int[0];
 
         int dir = (int)sc.compas;
         Vector2 v2 = sc.transform.position;
         Vector2 v2a = (Vector2)mygm.a.transform.position - v2;
         
+        if (PlayerPrefs.GetInt("idvision") == 1)
+        {
+            //Checks for 3 directional positions (empty/wall/apple)
+            sight = new int[3];
+            Vector2[] v2Possible = new Vector2[4];
+
+            //Add apple to board
+            Vector2 v2apple = AdjustPosToBoard((Vector2)mygm.a.transform.position);
+            mygm.board[(int)v2apple.x, (int)v2apple.y] = 2;
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 0);
+            v2Possible[2] = v2 + new Vector2(0, -1);
+            v2Possible[3] = v2 + new Vector2(-1, 0);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+        }
+        else if (PlayerPrefs.GetInt("idvision") == 2)
+        {
+            //Checks for 3 directional positions (empty/wall) & apple
+            sight = new int[5];
+            Vector2[] v2Possible = new Vector2[4];
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 0);
+            v2Possible[2] = v2 + new Vector2(0, -1);
+            v2Possible[3] = v2 + new Vector2(-1, 0);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+
+            v2a = GetAppleSight(dir, v2a);
+            sight[3] = (int)v2a.x;
+            sight[4] = (int)v2a.y;
+        }
+        else if (PlayerPrefs.GetInt("idvision") == 3)
+        {
+            //Checks for 3 directional positions (empty/wall/apple) & apple
+            sight = new int[5];
+            Vector2[] v2Possible = new Vector2[4];
+
+            //Add apple to board
+            Vector2 v2apple = AdjustPosToBoard((Vector2)mygm.a.transform.position);
+            mygm.board[(int)v2apple.x, (int)v2apple.y] = 2;
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 0);
+            v2Possible[2] = v2 + new Vector2(0, -1);
+            v2Possible[3] = v2 + new Vector2(-1, 0);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+
+            v2a = GetAppleSight(dir, v2a);
+            sight[3] = (int)v2a.x;
+            sight[4] = (int)v2a.y;
+        }
+        else if (PlayerPrefs.GetInt("idvision") == 4)
+        {
+            //Checks for 7 directional positions (empty/wall/apple)
+            sight = new int[7];
+            Vector2[] v2Possible = new Vector2[8];
+
+            //Add apple to board
+            Vector2 v2apple = AdjustPosToBoard((Vector2)mygm.a.transform.position);
+            mygm.board[(int)v2apple.x, (int)v2apple.y] = 2;
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 1);
+            v2Possible[2] = v2 + new Vector2(1, 0);
+            v2Possible[3] = v2 + new Vector2(1, -1);
+            v2Possible[4] = v2 + new Vector2(0, -1);
+            v2Possible[5] = v2 + new Vector2(-1, -1);
+            v2Possible[6] = v2 + new Vector2(-1, 0);
+            v2Possible[7] = v2 + new Vector2(-1, 1);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
+            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
+            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
+            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
+            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+        }
+        else if (PlayerPrefs.GetInt("idvision") == 5)
+        {
+            //Checks for 7 directional positions (empty/wall) & apple
+            sight = new int[9];
+            Vector2[] v2Possible = new Vector2[9];
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 1);
+            v2Possible[2] = v2 + new Vector2(1, 0);
+            v2Possible[3] = v2 + new Vector2(1, -1);
+            v2Possible[4] = v2 + new Vector2(0, -1);
+            v2Possible[5] = v2 + new Vector2(-1, -1);
+            v2Possible[6] = v2 + new Vector2(-1, 0);
+            v2Possible[7] = v2 + new Vector2(-1, 1);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
+            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
+            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
+            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
+            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+
+            v2a = GetAppleSight(dir, v2a);
+            sight[7] = (int)v2a.x;
+            sight[8] = (int)v2a.y;
+        }
+        else if (PlayerPrefs.GetInt("idvision") == 6)
+        {
+            //Checks for 7 directional positions (empty/wall/apple) & apple
+            sight = new int[9];
+            Vector2[] v2Possible = new Vector2[9];
+
+            //Add apple to board
+            Vector2 v2apple = AdjustPosToBoard((Vector2)mygm.a.transform.position);
+            mygm.board[(int)v2apple.x, (int)v2apple.y] = 2;
+
+            v2Possible[0] = v2 + new Vector2(0, 1);
+            v2Possible[1] = v2 + new Vector2(1, 1);
+            v2Possible[2] = v2 + new Vector2(1, 0);
+            v2Possible[3] = v2 + new Vector2(1, -1);
+            v2Possible[4] = v2 + new Vector2(0, -1);
+            v2Possible[5] = v2 + new Vector2(-1, -1);
+            v2Possible[6] = v2 + new Vector2(-1, 0);
+            v2Possible[7] = v2 + new Vector2(-1, 1);
+
+            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
+            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
+            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
+            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
+            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
+            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
+            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+
+            v2a = GetAppleSight(dir, v2a);
+            sight[7] = (int)v2a.x;
+            sight[8] = (int)v2a.y;
+        }
+
+        //robot sight
+        return sight;
+    }
+
+    private static Vector2 GetAppleSight(int dir, Vector2 diff)
+    {
+        Vector2 v2a = new Vector2();
         if (dir == 0 || dir == 2)
         {
-            if (((int)v2a.y < 0 && dir == 2) || ((int)v2a.y > 0 && dir == 0))
+            if (((int)diff.y < 0 && dir == 2) || ((int)diff.y > 0 && dir == 0))
             {
                 v2a.y = 2;
-            } else
+            }
+            else
             {
                 v2a.y = -2;
             }
 
-            if ((int)v2a.x < 0)
+            if ((int)diff.x < 0)
             {
-                v2a.x = dir == 0 ? -1: 1;
-            } else if ((int)v2a.x > 0)
+                v2a.x = dir == 0 ? -1 : 1;
+            }
+            else if ((int)diff.x > 0)
             {
-                v2a.x = dir == 0 ? 1: -1;
-            } else
+                v2a.x = dir == 0 ? 1 : -1;
+            }
+            else
             {
                 v2a.x = 0;
             }
-        } else
+        }
+        else
         {
-            if (((int)v2a.x < 0 && dir == 3) || ((int)v2a.x > 0 && dir == 1))
+            if (((int)diff.x < 0 && dir == 3) || ((int)diff.x > 0 && dir == 1))
             {
                 v2a.x = 2;
             }
@@ -247,11 +414,11 @@ public class GameMaster : MonoBehaviour
                 v2a.x = -2;
             }
 
-            if ((int)v2a.y < 0)
+            if ((int)diff.y < 0)
             {
                 v2a.y = dir == 3 ? -1 : 1;
             }
-            else if ((int)v2a.y > 0)
+            else if ((int)diff.y > 0)
             {
                 v2a.y = dir == 3 ? 1 : -1;
             }
@@ -260,23 +427,7 @@ public class GameMaster : MonoBehaviour
                 v2a.y = 0;
             }
         }
-
-        Vector2[] v2Possible = new Vector2[4];
-        v2Possible[0] = v2 + new Vector2(0, 1);
-        v2Possible[1] = v2 + new Vector2(1, 0);
-        v2Possible[2] = v2 + new Vector2(0, -1);
-        v2Possible[3] = v2 + new Vector2(-1, 0);
-
-        Debug.Log(v2Possible[SnakeController.Mod(dir - 1, 4)].ToString() + ", " + v2Possible[SnakeController.Mod(dir, 4)].ToString() + ", " + v2Possible[SnakeController.Mod(dir + 1, 4)].ToString());
-
-        sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
-        sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
-        sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
-        sight[3] = (int)v2a.x;
-        sight[4] = (int)v2a.y;
-
-        //robot sight
-        return sight;
+        return v2a;
     }
 
     private int CheckBoundry(Vector2 v2Possible)

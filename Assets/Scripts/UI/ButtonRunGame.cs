@@ -18,6 +18,7 @@ public class ButtonRunGame : MonoBehaviour
     public InputField txtMove;
     public InputField txtApple;
     public InputField txtWall;
+    public InputField txtVision;
 
     public Toggle isbot;
 
@@ -41,6 +42,8 @@ public class ButtonRunGame : MonoBehaviour
         PlayerPrefs.SetInt("move", int.Parse(txtMove.text));
         PlayerPrefs.SetInt("wall", int.Parse(txtWall.text));
         PlayerPrefs.SetInt("apple", int.Parse(txtApple.text));
+
+        PlayerPrefs.SetInt("idvision", int.Parse(txtVision.text));
 
         StartCoroutine(LogNewSnake());
     }
@@ -66,6 +69,8 @@ public class ButtonRunGame : MonoBehaviour
         form.AddField("wall",  (txtWall.text));
         form.AddField("apple", (txtApple.text));
 
+        form.AddField("vision", (txtVision.text));
+
         var download = UnityWebRequest.Post(attempts_url, form);
 
         // Wait until the download is done
@@ -77,7 +82,7 @@ public class ButtonRunGame : MonoBehaviour
         }
         else
         {
-            Debug.Log(download.downloadHandler.text);
+            //Debug.Log(download.downloadHandler.text);
             PlayerPrefs.SetInt("idplayer", int.Parse(download.downloadHandler.text));
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
