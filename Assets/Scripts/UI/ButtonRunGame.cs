@@ -31,6 +31,8 @@ public class ButtonRunGame : MonoBehaviour
 
     void OnClick()
     {
+        PlayerPrefs.SetString("name", txtName.text);
+
         PlayerPrefs.SetInt("isbot", isbot.isOn ? 1 : 0);
         PlayerPrefs.SetInt("boardsize", int.Parse(txtBoardSize.text));
 

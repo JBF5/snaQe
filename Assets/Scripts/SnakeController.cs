@@ -155,6 +155,7 @@ public class SnakeController : GamePiece
         SnakeBody sb = go.GetComponent<SnakeBody>();
 
         GameMaster.AddScore(1);
+        GameMaster.ReportScore(apples + 1);
 
         if (length == 1)
         {
