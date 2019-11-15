@@ -86,6 +86,8 @@ public class ButtonRunGame : MonoBehaviour
         {
             //Debug.Log(download.downloadHandler.text);
             PlayerPrefs.SetInt("idplayer", int.Parse(download.downloadHandler.text));
+            SnakeId.GetInstance().SetSnakeId(int.Parse(download.downloadHandler.text));
+
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
         }
     }

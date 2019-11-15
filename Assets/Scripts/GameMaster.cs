@@ -170,6 +170,7 @@ public class GameMaster : MonoBehaviour
         GetInstance().score += points;
         GetInstance().scoreText.text = GetInstance().score.ToString();
     }
+
     public static void ReportScore(int points)
     {
         if (points > GetInstance().highscore)
@@ -177,6 +178,12 @@ public class GameMaster : MonoBehaviour
             GetInstance().highscore = points;
             GetInstance().highscoreText.text = points.ToString();
         }
+    }
+
+    public int idplayer;
+    public static void SetPlayerId(int idplayer)
+    {
+        GetInstance().idplayer = idplayer;
     }
 
     public static void GameOver()

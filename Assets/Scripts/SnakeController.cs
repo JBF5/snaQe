@@ -193,7 +193,7 @@ public class SnakeController : GamePiece
         form.AddField("steps", steps.ToString());
         form.AddField("apples", apples.ToString());
         form.AddField("turns", turns.ToString());
-        form.AddField("idplayer", PlayerPrefs.GetInt("idplayer").ToString());
+        form.AddField("idplayer", SnakeId.GetInstance().GetSnakeId().ToString());
         form.AddField("killed", killed.ToString());
 
         var download = UnityWebRequest.Post(attempts_url, form);
