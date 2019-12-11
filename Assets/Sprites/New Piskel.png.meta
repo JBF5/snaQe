@@ -1,15 +1,21 @@
 fileFormatVersion: 2
-guid: 6f525b6d39583fa439f3d92806d68cbc
+guid: 79129853d7d70a243807e5425c5a7454
 TextureImporter:
-  fileIDToRecycleName:
-    21300000: snaQe_sprites_0
-    21300002: snaQe_sprites_1
-    21300004: snaQe_sprites_2
-    21300006: snaQe_sprites_3
-    21300008: snaQe_sprites_4
-    21300010: snaQe_sprites_5
+  internalIDToNameTable:
+  - first:
+      213: -2510476293373519475
+    second: apple
+  - first:
+      213: 627625725489826318
+    second: head
+  - first:
+      213: 6338068570567419226
+    second: body
+  - first:
+      213: -4309738878335270719
+    second: wall
   externalObjects: {}
-  serializedVersion: 7
+  serializedVersion: 10
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -51,7 +57,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 10
+  spritePixelsToUnits: 16
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -64,7 +70,7 @@ TextureImporter:
   compressionQualitySet: 0
   textureFormatSet: 0
   platformSettings:
-  - serializedVersion: 2
+  - serializedVersion: 3
     buildTarget: DefaultTexturePlatform
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -75,7 +81,8 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
-  - serializedVersion: 2
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: Standalone
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -86,125 +93,90 @@ TextureImporter:
     allowsAlphaSplitting: 0
     overridden: 0
     androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: snaQe_sprites_0
+      name: apple
       rect:
         serializedVersion: 2
         x: 0
         y: 16
-        width: 8
-        height: 8
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2e6022033de899e42bee5cdc182dc997
+      spriteID: a219e425dfb47a74d9a76233c9e54e34
+      internalID: -2510476293373519475
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: snaQe_sprites_1
-      rect:
-        serializedVersion: 2
-        x: 8
-        y: 16
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: eb81943780754544c96ca700e3b535ef
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: snaQe_sprites_2
+      name: head
       rect:
         serializedVersion: 2
         x: 16
         y: 16
-        width: 8
-        height: 8
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e428f98fab0c30640b9a8f91d21902db
+      spriteID: d4cc05158fc3dbf46ab9bf864b624529
+      internalID: 627625725489826318
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: snaQe_sprites_3
+      name: body
       rect:
         serializedVersion: 2
         x: 0
-        y: 8
-        width: 8
-        height: 8
+        y: 0
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 25a9a7ccc330c494baa638b9bfd0d0b3
+      spriteID: f53072adf753b7f4f9e6d1a9f46e684e
+      internalID: 6338068570567419226
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: snaQe_sprites_4
-      rect:
-        serializedVersion: 2
-        x: 8
-        y: 8
-        width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d5b8065fa09b8374cbfb517cae02cee4
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: snaQe_sprites_5
+      name: wall
       rect:
         serializedVersion: 2
         x: 16
-        y: 8
-        width: 8
-        height: 8
+        y: 0
+        width: 16
+        height: 16
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: dd4a0c57c57e57844bb03b26001745fa
+      spriteID: 36bedbbac00bd3542b88ce75b6ace156
+      internalID: -4309738878335270719
       vertices: []
       indices: 
       edges: []
@@ -213,10 +185,12 @@ TextureImporter:
     physicsShape: []
     bones: []
     spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
     vertices: []
     indices: 
     edges: []
     weights: []
+    secondaryTextures: []
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

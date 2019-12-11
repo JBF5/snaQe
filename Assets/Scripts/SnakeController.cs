@@ -29,6 +29,7 @@ public class SnakeController : GamePiece
     private int apples = 0;
     private int turns = 0;
     private int stepsWithoutFood = 0;
+    private int killed = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -83,6 +84,7 @@ public class SnakeController : GamePiece
         if (stepsWithoutFood > 1000 && PlayerPrefs.GetInt("isbot") == 1)
         {
             ms = MoveScore.DIE;
+            killed = 1;
             GameMaster.GetInstance().gameOver = true;
         }
 
@@ -94,7 +96,6 @@ public class SnakeController : GamePiece
     public override void PostGameStep()
     {
         int[] postSight = GameMaster.GetSight(this);
-        Debug.Log("Post " + postSight[0] + ", " + postSight[1] + ", " + postSight[2]);
     }
 
     public override void GameOver()
@@ -153,6 +154,7 @@ public class SnakeController : GamePiece
         GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
 
+        SnakeId.GetInstance().SetHighScore(apples + 1);
         GameMaster.AddScore(1);
 
         if (length == 1)
@@ -183,7 +185,7 @@ public class SnakeController : GamePiece
     IEnumerator LogSnakeStats()
     {
         //Connect to questions database
-        string domain = "http://3.87.156.253/";
+        string domain = "http://34.205.7.163/";
         string attempts_url = domain + "snake_stats.php";
 
         // Create a form object for sending data to the server
@@ -191,8 +193,9 @@ public class SnakeController : GamePiece
         form.AddField("steps", steps.ToString());
         form.AddField("apples", apples.ToString());
         form.AddField("turns", turns.ToString());
-        form.AddField("idplayer", PlayerPrefs.GetInt("idplayer").ToString());
-        form.AddField("killed", 0);
+        form.AddField("idplayer", SnakeId.GetInstance().GetSnakeId().ToString());
+        form.AddField("killed", killed.ToString());
+        form.AddField("attemptNo", SnakeId.GetInstance().GetAttempt().ToString());
 
         var download = UnityWebRequest.Post(attempts_url, form);
 
@@ -205,7 +208,7 @@ public class SnakeController : GamePiece
         }
         else
         {
-            Debug.Log(download.downloadHandler.text + "\nAttempt sent successfully");
+            //Debug.Log(download.downloadHandler.text + "\nAttempt sent successfully");
         }
     }
 

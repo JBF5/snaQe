@@ -111,7 +111,7 @@ public class qBot
             qTable[prevSight][action] = maxPrevF + lr * (reward + y * maxPostF - maxPrevF);
         }
 
-        Debug.Log("qscore " + qTable[prevSight][action]);
+        //Debug.Log("qscore " + qTable[prevSight][action]);
     }
 
     private static string Stringify(int[] sight)

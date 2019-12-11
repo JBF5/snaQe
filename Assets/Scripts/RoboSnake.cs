@@ -25,7 +25,7 @@ public class RoboSnake : GamePiece
     {
         //feed robot
         int[] sight = GameMaster.GetSight(sc);
-        Debug.Log("Pre " + sight[0] + ", " + sight[1] + ", " + sight[2]);
+        //Debug.Log("Pre " + sight[0] + ", " + sight[1] + ", " + sight[2]);
 
         //robot proccess
         int dirTurn = qb.ProcessSight(sight);
@@ -42,11 +42,11 @@ public class RoboSnake : GamePiece
     {
         //Get sight after moving
         int[] postSight = GameMaster.GetSight(sc);
-        Debug.Log("Post " + postSight[0] + ", " + postSight[1] + ", " + postSight[2]);
+        //Debug.Log("Post " + postSight[0] + ", " + postSight[1] + ", " + postSight[2]);
         //Get score from moving
         int reward = sc.GetMoveScore();
         //Process reward for moving
-        Debug.Log("Reward " + reward);
+        //Debug.Log("Reward " + reward);
         qb.ProcessReward(postSight, reward);
     }
 
