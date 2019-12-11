@@ -154,8 +154,8 @@ public class SnakeController : GamePiece
         GameObject go = Instantiate(goBodyPrefab, sbSnakeTail.transform.position, Quaternion.identity);
         SnakeBody sb = go.GetComponent<SnakeBody>();
 
+        SnakeId.GetInstance().SetHighScore(apples + 1);
         GameMaster.AddScore(1);
-        GameMaster.ReportScore(apples + 1);
 
         if (length == 1)
         {
@@ -185,7 +185,7 @@ public class SnakeController : GamePiece
     IEnumerator LogSnakeStats()
     {
         //Connect to questions database
-        string domain = "http://3.87.156.253/";
+        string domain = "http://34.205.7.163/";
         string attempts_url = domain + "snake_stats.php";
 
         // Create a form object for sending data to the server
@@ -195,6 +195,7 @@ public class SnakeController : GamePiece
         form.AddField("turns", turns.ToString());
         form.AddField("idplayer", SnakeId.GetInstance().GetSnakeId().ToString());
         form.AddField("killed", killed.ToString());
+        form.AddField("attemptNo", SnakeId.GetInstance().GetAttempt().ToString());
 
         var download = UnityWebRequest.Post(attempts_url, form);
 

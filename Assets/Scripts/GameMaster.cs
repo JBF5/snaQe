@@ -33,6 +33,7 @@ public class GameMaster : MonoBehaviour
     public bool gameRunning = true;
     public bool gameOver = false;
     private bool newGame = true;
+    private bool firstFrame = true;
 
     private Apple a;
 
@@ -62,17 +63,15 @@ public class GameMaster : MonoBehaviour
         a = FindObjectOfType<Apple>();
 
         gameSpeedSlider.onValueChanged.AddListener(delegate { SetGameSpeed(); });
-        if (PlayerPrefs.GetInt("isbot") == 1)
-        {
-            gameSpeedSlider.value = 2;
-            gameStepsPerTurn = 2;
-        } else
+        if (PlayerPrefs.GetInt("isbot") == 0)
         {
             gameSpeedSlider.value = 8;
             gameSpeedSlider.enabled = false;
             gameStepsPerTurn = 8;
         }
-        nameText.text = PlayerPrefs.GetString("name");
+
+        nameText.text = SnakeId.GetInstance().GetName();
+        highscoreText.text = SnakeId.GetInstance().GetHighScore().ToString();
     }
 
     private void SetGameSpeed()
@@ -91,6 +90,7 @@ public class GameMaster : MonoBehaviour
         {
             go.AddComponent<HumanSnake>();
         }
+        SnakeId.GetInstance().NewAttempt();
     }
 
     void FixedUpdate()
@@ -112,16 +112,6 @@ public class GameMaster : MonoBehaviour
                         gp.PostGameStep();
                     }
 
-                    //string output = "";
-                    //for (int i = 0; i < board.GetLength(0); i++)
-                    //{
-                    //    for (int j = 0; j < board.GetLength(1); j++)
-                    //    {
-                    //        output += board[j, i];
-                    //    }
-                    //    output += "\n";
-                    //}
-                    //Debug.Log(output);
                 }
                 else
                 {
@@ -154,6 +144,18 @@ public class GameMaster : MonoBehaviour
                 GameOver();
             }
         }
+
+
+        if (firstFrame)
+        {
+            firstFrame = false;
+
+            if (PlayerPrefs.GetInt("isbot") == 1)
+            {
+                gameSpeedSlider.value = 1;
+                gameStepsPerTurn = 1;
+            }
+        }
     }
 
     public static GameMaster GetInstance()
@@ -169,15 +171,7 @@ public class GameMaster : MonoBehaviour
     {
         GetInstance().score += points;
         GetInstance().scoreText.text = GetInstance().score.ToString();
-    }
-
-    public static void ReportScore(int points)
-    {
-        if (points > GetInstance().highscore)
-        {
-            GetInstance().highscore = points;
-            GetInstance().highscoreText.text = points.ToString();
-        }
+        GetInstance().highscoreText.text = SnakeId.GetInstance().GetHighScore().ToString();
     }
 
     public int idplayer;

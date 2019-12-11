@@ -216,7 +216,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20ed20466c471cb49be883d323cc896b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  strName: HeadlessSnakeman
+  strName: HeadlessSnakemanV6
   intBoardSize: 11
   fltLearningRate: 0.8
   fltDiscount: 0.95
@@ -225,4 +225,4 @@ MonoBehaviour:
   intMoveScore: -1
   intAppleScore: 250
   intWallScore: -100
-  intVisionId: 1
+  intVisionId: 6

@@ -32,6 +32,7 @@ public class ButtonRunGame : MonoBehaviour
     void OnClick()
     {
         PlayerPrefs.SetString("name", txtName.text);
+        SnakeId.GetInstance().SetName(txtName.text);
 
         PlayerPrefs.SetInt("isbot", isbot.isOn ? 1 : 0);
         PlayerPrefs.SetInt("boardsize", int.Parse(txtBoardSize.text));
@@ -53,7 +54,7 @@ public class ButtonRunGame : MonoBehaviour
     IEnumerator LogNewSnake()
     {
         //Connect to questions database
-        string domain = "http://3.87.156.253/";
+        string domain = "http://34.205.7.163/";
         string attempts_url = domain + "new_snake.php";
 
         // Create a form object for sending data to the server

@@ -46,7 +46,7 @@ public class HeadlessStart : MonoBehaviour
     IEnumerator LogNewSnake()
     {
         //Connect to questions database
-        string domain = "http://3.87.156.253/";
+        string domain = "http://34.205.7.163/";
         string attempts_url = domain + "new_snake.php";
 
         // Create a form object for sending data to the server
