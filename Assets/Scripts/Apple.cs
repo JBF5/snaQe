@@ -22,6 +22,11 @@ public class Apple : MonoBehaviour
             sc.Eat();
         }
 
+        MoveToNewSpace();
+    }
+
+    public void MoveToNewSpace()
+    {
         //Move the apple is moved 
         transform.position = GameMaster.GetRandomOpenSpace();
     }

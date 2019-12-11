@@ -23,12 +23,17 @@ public class GameMaster : MonoBehaviour
     private int gameStep = 0;
 
     public Text scoreText;
+    public Text highscoreText;
+    public Text nameText;
+    public Slider gameSpeedSlider;
     private int score;
+    private int highscore;
 
     public GameObject gameOverOverlay;
     public bool gameRunning = true;
     public bool gameOver = false;
     private bool newGame = true;
+    private bool firstFrame = true;
 
     private Apple a;
 
@@ -39,17 +44,6 @@ public class GameMaster : MonoBehaviour
 
         size = PlayerPrefs.GetInt("boardsize");
         board = new int[size, size];
-
-        //string output = "";
-        //for (int i = 0; i < board.GetLength(0); i++)
-        //{
-        //    for (int j = 0; j < board.GetLength(1); j++)
-        //    {
-        //        output += i + " " + j + ", ";
-        //    }
-        //    output += "\n";
-        //}
-        //Debug.Log(output);
 
         offset = size / 2;
         bool odd = size % 2 != 0;
@@ -67,6 +61,22 @@ public class GameMaster : MonoBehaviour
         }
 
         a = FindObjectOfType<Apple>();
+
+        gameSpeedSlider.onValueChanged.AddListener(delegate { SetGameSpeed(); });
+        if (PlayerPrefs.GetInt("isbot") == 0)
+        {
+            gameSpeedSlider.value = 8;
+            gameSpeedSlider.enabled = false;
+            gameStepsPerTurn = 8;
+        }
+
+        nameText.text = SnakeId.GetInstance().GetName();
+        highscoreText.text = SnakeId.GetInstance().GetHighScore().ToString();
+    }
+
+    private void SetGameSpeed()
+    {
+        gameStepsPerTurn = (int)gameSpeedSlider.value;
     }
 
     public void NewSnake()
@@ -80,6 +90,7 @@ public class GameMaster : MonoBehaviour
         {
             go.AddComponent<HumanSnake>();
         }
+        SnakeId.GetInstance().NewAttempt();
     }
 
     void FixedUpdate()
@@ -101,26 +112,12 @@ public class GameMaster : MonoBehaviour
                         gp.PostGameStep();
                     }
 
-                    //string output = "";
-                    //for (int i = 0; i < board.GetLength(0); i++)
-                    //{
-                    //    for (int j = 0; j < board.GetLength(1); j++)
-                    //    {
-                    //        output += board[j, i];
-                    //    }
-                    //    output += "\n";
-                    //}
-                    //Debug.Log(output);
                 }
                 else
                 {
                     newGame = false;
 
-                    if (PlayerPrefs.GetInt("isbot") == 1)
-                    {
-                        gameStepsPerTurn = 1;
-                    }
-
+                    a.MoveToNewSpace();
                     foreach (GamePiece gp in gps)
                     {
                         gp.GameStart();
@@ -147,6 +144,18 @@ public class GameMaster : MonoBehaviour
                 GameOver();
             }
         }
+
+
+        if (firstFrame)
+        {
+            firstFrame = false;
+
+            if (PlayerPrefs.GetInt("isbot") == 1)
+            {
+                gameSpeedSlider.value = 1;
+                gameStepsPerTurn = 1;
+            }
+        }
     }
 
     public static GameMaster GetInstance()
@@ -161,7 +170,14 @@ public class GameMaster : MonoBehaviour
     public static void AddScore(int points)
     {
         GetInstance().score += points;
-        GetInstance().scoreText.text = "Score: " + GetInstance().score.ToString();
+        GetInstance().scoreText.text = GetInstance().score.ToString();
+        GetInstance().highscoreText.text = SnakeId.GetInstance().GetHighScore().ToString();
+    }
+
+    public int idplayer;
+    public static void SetPlayerId(int idplayer)
+    {
+        GetInstance().idplayer = idplayer;
     }
 
     public static void GameOver()
@@ -196,8 +212,12 @@ public class GameMaster : MonoBehaviour
     public static Vector2 GetRandomOpenSpace()
     {
         GameMaster mygm = GetInstance();
-        Vector2 v2Rng = AdjustBoardToPos(new Vector2(Random.Range(0, mygm.size), Random.Range(0, mygm.size)));
-        return v2Rng;
+        Vector2 v2NewApple;
+        do
+        {
+            v2NewApple = new Vector2(Random.Range(0, mygm.size), Random.Range(0, mygm.size));
+        } while (GetInstance().CheckSurrounding(AdjustBoardToPos(v2NewApple)) != 0);
+        return AdjustBoardToPos(v2NewApple);
     }
 
     public static void Register(SnakeBody sb)
@@ -240,9 +260,11 @@ public class GameMaster : MonoBehaviour
             v2Possible[2] = v2 + new Vector2(0, -1);
             v2Possible[3] = v2 + new Vector2(-1, 0);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+            for (int i = 0, m = dir - 1; i < 3; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 4)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 4)]);
+            }
         }
         else if (PlayerPrefs.GetInt("idvision") == 2)
         {
@@ -255,9 +277,11 @@ public class GameMaster : MonoBehaviour
             v2Possible[2] = v2 + new Vector2(0, -1);
             v2Possible[3] = v2 + new Vector2(-1, 0);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+            for (int i = 0, m = dir - 1; i < 3; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 4)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 4)]);
+            }
 
             v2a = GetAppleSight(dir, v2a);
             sight[3] = (int)v2a.x;
@@ -278,9 +302,11 @@ public class GameMaster : MonoBehaviour
             v2Possible[2] = v2 + new Vector2(0, -1);
             v2Possible[3] = v2 + new Vector2(-1, 0);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir - 1, 4)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir, 4)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(dir + 1, 4)]);
+            for (int i = 0, m = dir - 1; i < 3; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 4)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 4)]);
+            }
 
             v2a = GetAppleSight(dir, v2a);
             sight[3] = (int)v2a.x;
@@ -305,13 +331,12 @@ public class GameMaster : MonoBehaviour
             v2Possible[6] = v2 + new Vector2(-1, 0);
             v2Possible[7] = v2 + new Vector2(-1, 1);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
-            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
-            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
-            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
-            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+            for (int i = 0, m = 2 * (dir - 1) - 1; i < 7; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 8)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 8)]);
+            }
+
         }
         else if (PlayerPrefs.GetInt("idvision") == 5)
         {
@@ -328,13 +353,11 @@ public class GameMaster : MonoBehaviour
             v2Possible[6] = v2 + new Vector2(-1, 0);
             v2Possible[7] = v2 + new Vector2(-1, 1);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
-            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
-            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
-            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
-            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+            for (int i = 0, m = 2 * (dir - 1) - 1; i < 7; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 8)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 8)]);
+            }
 
             v2a = GetAppleSight(dir, v2a);
             sight[7] = (int)v2a.x;
@@ -359,13 +382,11 @@ public class GameMaster : MonoBehaviour
             v2Possible[6] = v2 + new Vector2(-1, 0);
             v2Possible[7] = v2 + new Vector2(-1, 1);
 
-            sight[0] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1) - 1, 8)]);
-            sight[1] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir - 1), 8)]);
-            sight[2] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) - 1, 8)]);
-            sight[3] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir), 8)]);
-            sight[4] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir) + 1, 8)]);
-            sight[5] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1), 8)]);
-            sight[6] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(2 * (dir + 1) + 1, 8)]);
+            for (int i = 0, m = 2 * (dir - 1) - 1; i < 7; i++, m++)
+            {
+                sight[i] = mygm.CheckSurrounding(v2Possible[SnakeController.Mod(m, 8)]);
+                DebugDrawLine(sight[i], v2, v2Possible[SnakeController.Mod(m, 8)]);
+            }
 
             v2a = GetAppleSight(dir, v2a);
             sight[7] = (int)v2a.x;
@@ -374,6 +395,24 @@ public class GameMaster : MonoBehaviour
 
         //robot sight
         return sight;
+    }
+
+    private static void DebugDrawLine(int sight, Vector2 origin, Vector2 dest)
+    {
+        Color clrObject;
+        if (sight == 2)
+        {
+            clrObject = Color.red;
+        }
+        else if (sight == 1)
+        {
+            clrObject = Color.cyan;
+        }
+        else
+        {
+            clrObject = Color.white;
+        }
+        Debug.DrawLine(origin, dest, clrObject, GetInstance().gameStepsPerTurn * .02f);
     }
 
     private static Vector2 GetAppleSight(int dir, Vector2 diff)
